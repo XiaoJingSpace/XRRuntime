@@ -181,4 +181,6 @@ QVR API 已集成到 XR2 Platform 层：
 
 ## 联系方式
 
-如有问题，请提交 Issue。
+- 网站：https://XiaoJingSpace.com
+- 邮箱：taoxiulun@gmail.com
+- 如有问题，请提交 Issue。
