@@ -108,7 +108,5 @@ include/openxr/
 # Gradle wrapper (keep properties, but wrapper jar can be regenerated)
 gradle/wrapper/gradle-wrapper.jar
 
-# Large files and installers
-*.zip
-SnapdragonTool/*.exe
-SnapdragonTool/*.msi
+# Note: Large files (*.zip, *.exe, *.msi) are managed by Git LFS
+# See .gitattributes for LFS tracking configuration
