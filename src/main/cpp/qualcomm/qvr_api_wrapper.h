@@ -44,6 +44,22 @@ int QVRServiceClient_GetDisplayInterruptTimestampWrapper(QVRServiceClientHandle 
                                                           QVRSERVICE_DISP_INTERRUPT_ID interruptId,
                                                           qvrservice_ts_t** ts);
 
+// Parameter get/set
+int QVRServiceClient_GetParamWrapper(QVRServiceClientHandle handle, const char* name, 
+                                     uint32_t* len, char* value);
+int QVRServiceClient_SetParamWrapper(QVRServiceClientHandle handle, const char* name, 
+                                     const char* value);
+
+// Hardware transforms
+int QVRServiceClient_GetHwTransformsWrapper(QVRServiceClientHandle handle, 
+                                            uint32_t* numTransforms, 
+                                            qvrservice_hw_transform_t* transforms);
+
+// Operating level (power management)
+int QVRServiceClient_SetOperatingLevelWrapper(QVRServiceClientHandle handle,
+                                               qvrservice_perf_level_t* perfLevels,
+                                               uint32_t numPerfLevels);
+
 // Time conversion
 XrTime QVRTimeToXrTime(uint64_t qvrTime);
 uint64_t XrTimeToQVRTime(XrTime xrTime);

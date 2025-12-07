@@ -3,12 +3,35 @@
 
 #include <openxr/openxr.h>
 
+// Forward declaration
+typedef struct XrInstance_T* XrInstance;
+
 // Interaction profile bindings
 bool RegisterInteractionProfileBindings(XrPath interactionProfile, 
                                         const XrActionSuggestedBinding* bindings, 
                                         uint32_t bindingCount);
 
 bool AttachActionSetsToSession(XrSession session, XrActionSet* actionSets, uint32_t count);
+
+// Get binding path for an action
+XrPath GetActionBindingPath(XrAction action);
+
+// Parsed input path structure
+struct ParsedInputPath {
+    uint32_t controllerIndex;  // 0 = left, 1 = right
+    std::string inputType;     // "trigger", "thumbstick", "button", etc.
+    std::string component;      // "value", "click", "touch", etc.
+    bool valid;
+};
+
+// Parse input path from binding path
+ParsedInputPath ParseInputPath(XrPath bindingPath);
+
+// Get current instance (for path conversion)
+XrInstance GetCurrentInstance();
+
+// Get path string from path
+std::string GetPathString(XrInstance instance, XrPath path);
 
 // Action state queries
 bool GetBooleanActionState(XrAction action, XrPath subactionPath, 

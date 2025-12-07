@@ -2,6 +2,7 @@
 #include "utils/logger.h"
 #include <mutex>
 #include <cstring>
+#include <cstdlib>
 
 // QVR API state
 static QVRServiceClientHandle g_qvrClient = nullptr;
@@ -38,11 +39,32 @@ bool InitializeQVRAPI() {
     LOGI("VR Mode state: %d", vrMode);
     
     // Get tracker-android offset if available
-    // This is used for time conversion
+    // This is used for time conversion between QTimer and Android time domains
     char offsetStr[64] = {0};
     uint32_t offsetLen = sizeof(offsetStr);
-    // Note: This would require GetParam implementation
-    // For now, we'll use 0 offset
+    int result = QVRServiceClient_GetParamWrapper(g_qvrClient, 
+                                                   "tracker-android-offset-ns", 
+                                                   &offsetLen, 
+                                                   offsetStr);
+    if (result == QVR_SUCCESS && offsetLen > 0) {
+        // Parse offset string to uint64_t
+        g_qvrAndroidOffsetNs = static_cast<uint64_t>(std::atoll(offsetStr));
+        LOGI("QVR tracker-android offset: %llu ns", g_qvrAndroidOffsetNs);
+    } else {
+        // Try alternative parameter name
+        offsetLen = sizeof(offsetStr);
+        result = QVRServiceClient_GetParamWrapper(g_qvrClient,
+                                                   "QVRSERVICE_TRACKER_ANDROID_OFFSET_NS",
+                                                   &offsetLen,
+                                                   offsetStr);
+        if (result == QVR_SUCCESS && offsetLen > 0) {
+            g_qvrAndroidOffsetNs = static_cast<uint64_t>(std::atoll(offsetStr));
+            LOGI("QVR tracker-android offset (alt): %llu ns", g_qvrAndroidOffsetNs);
+        } else {
+            LOGW("Failed to get tracker-android offset, using 0");
+            g_qvrAndroidOffsetNs = 0;
+        }
+    }
     
     g_qvrInitialized = true;
     LOGI("QVR API initialized successfully");
@@ -153,6 +175,40 @@ int QVRServiceClient_GetDisplayInterruptTimestampWrapper(QVRServiceClientHandle 
         return QVR_INVALID_PARAM;
     }
     return QVRServiceClient_GetDisplayInterruptTimestamp(handle, interruptId, ts);
+}
+
+int QVRServiceClient_GetParamWrapper(QVRServiceClientHandle handle, const char* name, 
+                                     uint32_t* len, char* value) {
+    if (!handle || !name || !len) {
+        return QVR_INVALID_PARAM;
+    }
+    return QVRServiceClient_GetParam(handle, name, len, value);
+}
+
+int QVRServiceClient_SetParamWrapper(QVRServiceClientHandle handle, const char* name, 
+                                     const char* value) {
+    if (!handle || !name || !value) {
+        return QVR_INVALID_PARAM;
+    }
+    return QVRServiceClient_SetParam(handle, name, value);
+}
+
+int QVRServiceClient_GetHwTransformsWrapper(QVRServiceClientHandle handle, 
+                                            uint32_t* numTransforms, 
+                                            qvrservice_hw_transform_t* transforms) {
+    if (!handle || !numTransforms) {
+        return QVR_INVALID_PARAM;
+    }
+    return QVRServiceClient_GetHwTransforms(handle, numTransforms, transforms);
+}
+
+int QVRServiceClient_SetOperatingLevelWrapper(QVRServiceClientHandle handle,
+                                               qvrservice_perf_level_t* perfLevels,
+                                               uint32_t numPerfLevels) {
+    if (!handle || !perfLevels || numPerfLevels == 0) {
+        return QVR_INVALID_PARAM;
+    }
+    return QVRServiceClient_SetOperatingLevel(handle, perfLevels, numPerfLevels, nullptr, nullptr);
 }
 
 XrTime QVRTimeToXrTime(uint64_t qvrTime) {

@@ -66,8 +66,9 @@ bool GetXR2ViewConfigurationViews(XrViewConfigurationView* views, uint32_t count
         return false;
     }
     
-    // Set view properties for both eyes
-    for (uint32_t i = 0; i < count; ++i) {
+    // Set view properties for both eyes (binocular rendering)
+    // Each eye gets its own independent render target
+    for (uint32_t i = 0; i < count && i < 2; ++i) {
         views[i].type = XR_TYPE_VIEW_CONFIGURATION_VIEW;
         views[i].recommendedImageRectWidth = recommendedWidth;
         views[i].recommendedImageRectHeight = recommendedHeight;
@@ -75,6 +76,11 @@ bool GetXR2ViewConfigurationViews(XrViewConfigurationView* views, uint32_t count
         views[i].maxImageRectHeight = maxHeight;
         views[i].recommendedSwapchainSampleCount = 1;
         views[i].maxSwapchainSampleCount = 4;
+    }
+    
+    // If more than 2 views requested, duplicate the configuration
+    for (uint32_t i = 2; i < count; ++i) {
+        views[i] = views[i % 2];
     }
     
     return true;

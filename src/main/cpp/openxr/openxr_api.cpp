@@ -124,6 +124,7 @@ XrResult xrStringToPath(XrInstance instance, const char* pathString, XrPath* pat
     // In a real implementation, this would maintain a path registry
     static std::mutex pathMutex;
     static std::unordered_map<std::string, XrPath> pathMap;
+    static std::unordered_map<XrPath, std::string> pathToStringMap; // Reverse mapping
     static XrPath nextPath = 1;
     
     std::lock_guard<std::mutex> lock(pathMutex);
@@ -133,6 +134,8 @@ XrResult xrStringToPath(XrInstance instance, const char* pathString, XrPath* pat
     } else {
         *path = nextPath++;
         pathMap[pathString] = *path;
+        // Also register reverse mapping for path to string conversion
+        pathToStringMap[*path] = pathString;
     }
     
     return XR_SUCCESS;
@@ -152,13 +155,13 @@ XrResult xrPathToString(XrInstance instance, XrPath path, uint32_t bufferCapacit
     }
     
     // Simple path to string conversion
-    // In a real implementation, this would maintain a path registry
+    // Use the same registry as xrStringToPath
     static std::mutex pathMutex;
-    static std::unordered_map<XrPath, std::string> pathMap;
+    static std::unordered_map<XrPath, std::string> pathToStringMap;
     
     std::lock_guard<std::mutex> lock(pathMutex);
-    auto it = pathMap.find(path);
-    if (it == pathMap.end()) {
+    auto it = pathToStringMap.find(path);
+    if (it == pathToStringMap.end()) {
         return XR_ERROR_PATH_INVALID;
     }
     
