@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['svrfoveatedeyegazestate',['svrFoveatedEyeGazeState',['../sxr_api_8h.html#a647ad6dfd8fae88316ec2c166b281889',1,'sxrApi.h']]],
+  ['sxrcontrollerconnectionstate',['sxrControllerConnectionState',['../sxr_api_8h.html#abbd86288b18c171e102f2c481aba4645',1,'sxrApi.h']]],
+  ['sxrcontrollermessagetype',['sxrControllerMessageType',['../sxr_api_8h.html#a9d282f51f46b0c39fd8af253007ed1d7',1,'sxrApi.h']]],
+  ['sxrcontrollerquerytype',['sxrControllerQueryType',['../sxr_api_8h.html#aec4faad8924333483e4c1e5e326d04f1',1,'sxrApi.h']]],
+  ['sxreventtype',['sxrEventType',['../sxr_api_8h.html#a3d0dda794c857eeb8fe94c0624c7c06a',1,'sxrApi.h']]],
+  ['sxreyemask',['sxrEyeMask',['../sxr_api_8h.html#a8ee12f5d9b42d40388b450c22d501e49',1,'sxrApi.h']]],
+  ['sxreyeposeflags',['sxrEyePoseFlags',['../sxr_api_8h.html#aa24af10448568b26ca48f87693d60c98',1,'sxrApi.h']]],
+  ['sxreyeposestatus',['sxrEyePoseStatus',['../sxr_api_8h.html#afc5d0fcb437a7b7a3c7ab0c49d391da5',1,'sxrApi.h']]],
+  ['sxrframeoption',['sxrFrameOption',['../sxr_api_8h.html#a2942f1040cc779c981b47384c3d25a8c',1,'sxrApi.h']]],
+  ['sxrlayerflags',['sxrLayerFlags',['../sxr_api_8h.html#abf84f0093fe47a25c42bfe9982a20332',1,'sxrApi.h']]],
+  ['sxroptionflags',['sxrOptionFlags',['../sxr_api_8h.html#afd74cddad9796dd12dc096a36cc850f0',1,'sxrApi.h']]],
+  ['sxrperflevel',['sxrPerfLevel',['../sxr_api_8h.html#ae886d4cc5a48ac263eeed37cf58da584',1,'sxrApi.h']]],
+  ['sxrtexturetype',['sxrTextureType',['../sxr_api_8h.html#a6cb535a5cb143c68a5e21830da706d49',1,'sxrApi.h']]],
+  ['sxrtrackingmode',['sxrTrackingMode',['../sxr_api_8h.html#a5b035e00cce4c3b58d867ab28119befe',1,'sxrApi.h']]],
+  ['sxrwarpmeshenum',['sxrWarpMeshEnum',['../sxr_api_8h.html#a1d054fe5dc44e70b76a4271b2ee06888',1,'sxrApi.h']]],
+  ['sxrwarpmeshtype',['sxrWarpMeshType',['../sxr_api_8h.html#ae514bcaac80386b7773fd9449de8beed',1,'sxrApi.h']]],
+  ['sxrwarptype',['sxrWarpType',['../sxr_api_8h.html#aa80e7066fd8c317e25f51bb876497c95',1,'sxrApi.h']]],
+  ['sxrwhicheye',['sxrWhichEye',['../sxr_api_8h.html#ab5075d7d28a2c6a74d1f8c6fd0f666d5',1,'sxrApi.h']]]
+];

@@ -1,0 +1,113 @@
+apply plugin: 'com.android.application'
+project.ext.SXRLocation = System.getenv('SXR_HOME') + '/sxrApi/libs'
+
+android {
+    compileSdkVersion 28
+    
+    defaultConfig {
+        applicationId "com.qualcomm.sxr.multidisplayvr"
+        minSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+		setProperty("archivesBaseName", "multidisplayvr")
+		manifestPlaceholders = ["orientation" : "landscape"]
+
+        ndk.abiFilters 'armeabi-v7a'
+        ndk.stl "stlport_static"
+
+
+    }
+	
+    android {
+      lintOptions {
+          abortOnError false
+      }
+    }
+
+	repositories {
+        flatDir {
+            dirs project.ext.SXRLocation
+        }
+    }
+
+/*  //uncomment this to see deprecated API usages like the PreferenceManager  
+    gradle.projectsEvaluated {
+       tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }	*/
+
+    signingConfigs{
+		unsigned{
+			storeFile file("${System.env.USERPROFILE}/.android/debug.keystore")
+			storePassword = "android"
+			keyAlias = "androiddebugkey"
+			keyPassword = "android"
+			v2SigningEnabled = false
+		}
+	}
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+			signingConfig signingConfigs.unsigned
+        }
+        debug {
+            debuggable = true
+            jniDebuggable = true
+        }
+		
+    }
+	
+	flavorDimensions "screenOrientation"
+  
+		productFlavors 
+		{
+			ll {
+				dimension "screenOrientation"
+				manifestPlaceholders =  ["orientation" : "landscape"]
+			}
+
+			lr {
+				dimension "screenOrientation"
+				manifestPlaceholders = ["orientation" : "reverseLandscape"]
+			}
+			port {
+				dimension "screenOrientation"
+				manifestPlaceholders = ["orientation" : "portrait"]
+			}			
+		}
+    externalNativeBuild {
+        ndkBuild {
+            path '../jni/Android.mk'
+        }
+    }
+
+
+}
+
+dependencies {
+    debugImplementation(name: 'sxrApi-debug', ext: 'aar')
+    releaseImplementation(name: 'sxrApi-release', ext: 'aar')
+    implementation "com.android.support:appcompat-v7:28.0.0"
+}
+
+android.buildTypes.all { theBuildType ->
+    task ("extractSxrSo${theBuildType.name}") {
+	        
+		tasks.whenTaskAdded { task ->
+            if( task.name.startsWith("externalNativeBuild") && task.name.endsWith(theBuildType.name.substring(1))) {
+                task.dependsOn 'extractSxrSo' + theBuildType.name
+            }
+        }
+        doLast {
+		
+            copy {
+                from zipTree(project.ext.SXRLocation + "/sxrApi-" + theBuildType.name + ".aar")
+                into ".sxrLibs/" + theBuildType.name
+                include "jni/**/*.so"
+            }
+        }
+    }
+}
