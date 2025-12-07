@@ -1,9 +1,0 @@
-<resources>
-    <string name="appName">MultiDisplayVR</string>
-    <string name="activityNameLauncherDisplay">MultiDisplayVR_Launcher_Display</string>
-    <string name="activityNameSecondaryDisplay">MultiDisplayVR_Secondary_Display</string>
-    <string name="noSecondaryDisplay">No secondary display found; nothing to do</string>
-    <string name="intentColorId">colorId</string>
-    <string name="color0">Bright Tori</string>
-    <string name="color1">Dim Tori</string>
-</resources>

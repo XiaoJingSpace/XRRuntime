@@ -1,7 +1,0 @@
-SETLOCAL
-SET MY_PATH=%~dp0
-
-adb uninstall com.qualcomm.svr.spacewarp
-adb install -g %MY_PATH%spacewarpvr-ll-release.apk
-
-pause

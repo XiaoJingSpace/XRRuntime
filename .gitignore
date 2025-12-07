@@ -108,7 +108,8 @@ include/openxr/
 # Gradle wrapper (keep properties, but wrapper jar can be regenerated)
 gradle/wrapper/gradle-wrapper.jar
 
-# Large SDK zip files (should not be committed)
+# Large SDK folder and zip files (should not be committed)
+SnapdragonXR-SDK-source.rel.*/
 SnapdragonXR-SDK-source.rel.*.zip
 
 # Note: Some large files (*.exe, *.msi in SnapdragonTool) are managed by Git LFS
