@@ -2,7 +2,16 @@
 #define XR2_PLATFORM_H
 
 #include <openxr/openxr.h>
+#include <openxr/openxr_platform.h>
 #include "qvr_api_wrapper.h"
+
+// Custom structure for XR2 graphics properties
+// Note: This is not part of standard OpenXR, but used internally for XR2 platform
+typedef struct XrGraphicsPropertiesOpenGLESKHR {
+    uint32_t maxSwapchainImageWidth;
+    uint32_t maxSwapchainImageHeight;
+    uint32_t maxSwapchainImageLayers;
+} XrGraphicsPropertiesOpenGLESKHR;
 
 // Platform initialization
 bool InitializeXR2Platform();

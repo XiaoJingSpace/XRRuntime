@@ -11,11 +11,11 @@
 
 struct InteractionProfileBinding {
     XrPath interactionProfile;
-    std::unordered_map<XrPath, XrPath> bindings; // action -> input source (binding path)
+    std::unordered_map<uintptr_t, XrPath> bindings; // action (as uintptr_t) -> input source (binding path)
 };
 
-// Action to binding path mapping
-static std::unordered_map<XrAction, XrPath> g_actionToBindingPath;
+// Action to binding path mapping (using uintptr_t as key since XrAction is an opaque handle)
+static std::unordered_map<uintptr_t, XrPath> g_actionToBindingPath;
 
 // Forward declarations
 extern "C" XrResult xrPathToString(XrInstance instance, XrPath path, uint32_t bufferCapacityInput, 
@@ -48,9 +48,11 @@ bool RegisterInteractionProfileBindings(XrPath interactionProfile,
     profileBinding.interactionProfile = interactionProfile;
     
     for (uint32_t i = 0; i < bindingCount; ++i) {
-        profileBinding.bindings[bindings[i].action] = bindings[i].binding;
+        // Convert XrAction handle to uintptr_t for use as map key
+        uintptr_t actionKey = reinterpret_cast<uintptr_t>(bindings[i].action);
+        profileBinding.bindings[actionKey] = bindings[i].binding;
         // Store action to binding path mapping
-        g_actionToBindingPath[bindings[i].action] = bindings[i].binding;
+        g_actionToBindingPath[actionKey] = bindings[i].binding;
     }
     
     g_profileBindings.push_back(profileBinding);
@@ -61,12 +63,7 @@ bool RegisterInteractionProfileBindings(XrPath interactionProfile,
 
 // Parse binding path to extract controller index and input information
 // Example: "/user/hand/left/input/trigger/value" -> controller=0 (left), input="trigger", component="value"
-struct ParsedInputPath {
-    uint32_t controllerIndex;  // 0 = left, 1 = right
-    std::string inputType;     // "trigger", "thumbstick", "button", etc.
-    std::string component;      // "value", "click", "touch", etc.
-    bool valid;
-};
+// Note: ParsedInputPath is already defined in input_manager.h
 
 // Get path string by converting path to string using xrPathToString
 std::string GetPathString(XrInstance instance, XrPath path) {
@@ -158,7 +155,7 @@ void RegisterPathString(XrPath path, const char* pathString) {
     pathToStringMap[path] = pathString;
 }
 
-bool AttachActionSetsToSession(XrSession session, XrActionSet* actionSets, uint32_t count) {
+bool AttachActionSetsToSession(XrSession session, const XrActionSet* actionSets, uint32_t count) {
     std::lock_guard<std::mutex> lock(g_inputMutex);
     
     std::vector<XrActionSet> sets;
@@ -174,7 +171,8 @@ bool AttachActionSetsToSession(XrSession session, XrActionSet* actionSets, uint3
 
 XrPath GetActionBindingPath(XrAction action) {
     std::lock_guard<std::mutex> lock(g_inputMutex);
-    auto it = g_actionToBindingPath.find(action);
+    uintptr_t actionKey = reinterpret_cast<uintptr_t>(action);
+    auto it = g_actionToBindingPath.find(actionKey);
     if (it != g_actionToBindingPath.end()) {
         return it->second;
     }

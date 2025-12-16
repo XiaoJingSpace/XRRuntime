@@ -4,6 +4,7 @@
 #include "utils/logger.h"
 #include "utils/error_handler.h"
 #include <cstring>
+#include <cstdint>
 #include <mutex>
 #include <unordered_map>
 #include <atomic>
@@ -26,8 +27,8 @@ struct XRInstance {
     }
 };
 
-static std::mutex g_instanceMutex;
-static std::unordered_map<XrInstance, std::shared_ptr<XRInstance>> g_instances;
+std::mutex g_instanceMutex;
+std::unordered_map<XrInstance, std::shared_ptr<XRInstance>> g_instances;
 static XrInstance g_nextInstanceHandle = reinterpret_cast<XrInstance>(1);
 
 XrResult xrCreateInstance(const XrInstanceCreateInfo* createInfo, XrInstance* instance) {
@@ -68,7 +69,11 @@ XrResult xrCreateInstance(const XrInstanceCreateInfo* createInfo, XrInstance* in
     
     // Register instance
     std::lock_guard<std::mutex> lock(g_instanceMutex);
-    XrInstance handle = g_nextInstanceHandle++;
+    // Increment handle using integer arithmetic (handles are pointers in 64-bit)
+    uintptr_t handleValue = reinterpret_cast<uintptr_t>(g_nextInstanceHandle);
+    handleValue++;
+    XrInstance handle = reinterpret_cast<XrInstance>(handleValue);
+    g_nextInstanceHandle = handle;
     g_instances[handle] = xrInstance;
     *instance = handle;
     
@@ -175,9 +180,14 @@ XrResult xrGetSystemProperties(XrInstance instance, XrSystemId systemId, XrSyste
     strncpy(properties->systemName, "Qualcomm XR2", XR_MAX_SYSTEM_NAME_SIZE - 1);
     
     // Get graphics properties from platform
-    if (!GetXR2GraphicsProperties(&properties->graphicsProperties)) {
+    XrGraphicsPropertiesOpenGLESKHR xr2GraphicsProps = {};
+    if (!GetXR2GraphicsProperties(&xr2GraphicsProps)) {
         return XR_ERROR_RUNTIME_FAILURE;
     }
+    // Copy to standard OpenXR structure
+    properties->graphicsProperties.maxSwapchainImageWidth = xr2GraphicsProps.maxSwapchainImageWidth;
+    properties->graphicsProperties.maxSwapchainImageHeight = xr2GraphicsProps.maxSwapchainImageHeight;
+    properties->graphicsProperties.maxLayerCount = xr2GraphicsProps.maxSwapchainImageLayers;
     
     // Get tracking properties
     if (!GetXR2TrackingProperties(&properties->trackingProperties)) {

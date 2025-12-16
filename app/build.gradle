@@ -5,6 +5,9 @@ plugins {
 android {
     namespace 'com.xrruntime'
     compileSdk 33
+    
+    // Specify NDK version (removes deprecation warning about ndk.dir)
+    ndkVersion "23.1.7779620"
 
     defaultConfig {
         minSdk 31
@@ -66,5 +69,67 @@ android {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
+}
+
+// Task to automatically copy .so files to outputs/jniLibs after build
+afterEvaluate {
+    android.libraryVariants.all { variant ->
+        def variantName = variant.name.capitalize()
+        def buildType = variant.buildType.name
+        
+        // Create copy task for this variant
+        def copyTaskName = "copy${variantName}SoToOutputs"
+        def copyTask = tasks.create(copyTaskName) {
+            description = "Copy ${buildType} .so files to outputs/jniLibs"
+            group = "build"
+            
+            doLast {
+                // Find CMake build directory (it's a hash, so we search for it)
+                def cxxBaseDir = file("${project.buildDir}/intermediates/cxx/${variantName}")
+                if (!cxxBaseDir.exists()) {
+                    println "⚠ CMake build directory not found for ${variantName}"
+                    return
+                }
+                
+                // Find the hash-named subdirectory
+                def hashDirs = cxxBaseDir.listFiles({ File f -> 
+                    f.isDirectory() && f.name.matches(/[a-f0-9]+/) 
+                } as FileFilter)
+                
+                if (hashDirs == null || hashDirs.length == 0) {
+                    println "⚠ CMake build hash directory not found for ${variantName}"
+                    return
+                }
+                
+                def soFile = file("${hashDirs[0]}/obj/arm64-v8a/libxrruntime.so")
+                def targetDir = file("${project.buildDir}/outputs/jniLibs/arm64-v8a")
+                
+                if (soFile.exists()) {
+                    targetDir.mkdirs()
+                    copy {
+                        from soFile
+                        into targetDir
+                    }
+                    println "✓ Copied libxrruntime.so to ${targetDir}"
+                } else {
+                    println "⚠ libxrruntime.so not found at ${soFile}, skipping copy"
+                }
+            }
+        }
+        
+        // Make copy task run after CMake build tasks
+        tasks.matching { task ->
+            task.name.startsWith("buildCMake${variantName}") && 
+            task.name.contains("[arm64-v8a]")
+        }.all { cmakeTask ->
+            cmakeTask.finalizedBy(copyTask)
+        }
+        
+        // Also run after assemble task
+        def assembleTask = tasks.findByName("assemble${variantName}")
+        if (assembleTask != null) {
+            assembleTask.finalizedBy(copyTask)
+        }
+    }
 }
 

@@ -2,6 +2,7 @@
 #define INPUT_MANAGER_H
 
 #include <openxr/openxr.h>
+#include <string>
 
 // Forward declaration
 typedef struct XrInstance_T* XrInstance;
@@ -11,7 +12,7 @@ bool RegisterInteractionProfileBindings(XrPath interactionProfile,
                                         const XrActionSuggestedBinding* bindings, 
                                         uint32_t bindingCount);
 
-bool AttachActionSetsToSession(XrSession session, XrActionSet* actionSets, uint32_t count);
+bool AttachActionSetsToSession(XrSession session, const XrActionSet* actionSets, uint32_t count);
 
 // Get binding path for an action
 XrPath GetActionBindingPath(XrAction action);

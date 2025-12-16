@@ -42,6 +42,13 @@ misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
 
+# VS Code / Cursor
+.vscode/
+!.vscode/tasks.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 # Keystore files
 *.jks
 *.keystore
@@ -105,8 +112,9 @@ include/openxr/
 *.so
 *.a
 
-# Gradle wrapper (keep properties, but wrapper jar can be regenerated)
+# Gradle wrapper (keep properties, but wrapper jar and zip files can be regenerated)
 gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/*.zip
 
 # Large SDK folder and zip files (should not be committed)
 # Keep the folder structure but ignore all contents except .gitkeep

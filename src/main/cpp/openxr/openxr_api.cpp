@@ -2,6 +2,7 @@
 #include "utils/logger.h"
 #include "utils/error_handler.h"
 #include "platform/android_platform.h"
+#include "platform/display_manager.h"
 #include "qualcomm/xr2_platform.h"
 #include <unordered_map>
 #include <atomic>
@@ -17,10 +18,12 @@ struct XRSwapchain;
 struct XRActionSet;
 struct XRAction;
 
+// Runtime initialization state
+std::atomic<bool> g_runtimeInitialized(false);
+
 // External declarations from other modules
 extern std::mutex g_instanceMutex;
 extern std::unordered_map<XrInstance, std::shared_ptr<XRInstance>> g_instances;
-extern std::atomic<bool> g_runtimeInitialized;
 
 extern std::mutex g_sessionMutex;
 extern std::unordered_map<XrSession, std::shared_ptr<XRSession>> g_sessions;
@@ -281,11 +284,19 @@ XrResult xrGetReferenceSpaceBoundsRect(XrSession session, XrReferenceSpaceType r
     // Get bounds from platform
     if (referenceSpaceType == XR_REFERENCE_SPACE_TYPE_STAGE) {
         if (!GetXR2StageBounds(bounds)) {
-            return XR_ERROR_SPACE_BOUNDS_UNAVAILABLE;
+            // XR_SPACE_BOUNDS_UNAVAILABLE is a state value, not an error code
+            // Return success with zero bounds
+            bounds->width = 0.0f;
+            bounds->height = 0.0f;
+            return XR_SUCCESS;
         }
     } else {
         // Other space types don't have bounds
-        return XR_ERROR_SPACE_BOUNDS_UNAVAILABLE;
+        // Note: XR_SPACE_BOUNDS_UNAVAILABLE is a state value, not an error code
+        // We should return XR_SUCCESS with bounds set to zero or return an appropriate error
+        bounds->width = 0.0f;
+        bounds->height = 0.0f;
+        return XR_SUCCESS;
     }
     
     return XR_SUCCESS;

@@ -16,8 +16,14 @@
 static bool g_xr2Initialized = false;
 static bool g_displayInitialized = false;
 static bool g_trackingInitialized = false;
+static bool g_handTrackingInitialized = false; // Separate flag for hand tracking
 static bool g_renderingActive = false;
 static std::mutex g_xr2Mutex;
+
+// Prediction coefficients for pose prediction
+static float g_predictionCoeffS[3] = {0.0f, 0.0f, 0.0f}; // Velocity coefficients
+static float g_predictionCoeffB[3] = {0.0f, 0.0f, 0.0f}; // Acceleration coefficients
+static float g_predictionCoeffBdt[3] = {0.0f, 0.0f, 0.0f}; // Higher order terms
 
 // Display properties (XR2 typical values)
 static const uint32_t XR2_RECOMMENDED_WIDTH = 1832;
@@ -37,7 +43,7 @@ static const uint32_t FPS_SAMPLE_COUNT = 60;
 // Power management
 static bool g_powerOptimizationEnabled = false;
 static uint32_t g_currentPerfLevel = 0; // 0 = balanced, higher = more performance
-static const uint32_t MAX_PERF_LEVEL = 3;
+static const uint32_t XR2_MAX_PERF_LEVEL = 3;
 
 bool InitializeXR2Platform() {
     std::lock_guard<std::mutex> lock(g_xr2Mutex);
@@ -871,9 +877,7 @@ static XrPosef g_currentHeadPose = {{0, 0, 0, 1}, {0, 0, 0}};
 static XrPosef g_smoothedHeadPose = {{0, 0, 0, 1}, {0, 0, 0}};
 
 // Pose prediction coefficients (from QVR tracking data)
-static float g_predictionCoeffS[3] = {0, 0, 0};
-static float g_predictionCoeffB[3] = {0, 0, 0};
-static float g_predictionCoeffBdt[3] = {0, 0, 0};
+// Note: These are already defined at the top of the file, removing duplicate definitions
 static float g_predictionCoeffBdt2[3] = {0, 0, 0};
 
 // Smoothing factor for pose (0.0 = no smoothing, 1.0 = full smoothing)
@@ -889,7 +893,7 @@ bool BeginXR2FrameRendering() {
     // Adaptive quality and power management
     if (g_averageFrameTime > 0.0f) {
         // Adjust performance level based on FPS
-        if (g_currentFPS < XR2_REFRESH_RATE * 0.7f && g_currentPerfLevel < MAX_PERF_LEVEL) {
+        if (g_currentFPS < XR2_REFRESH_RATE * 0.7f && g_currentPerfLevel < XR2_MAX_PERF_LEVEL) {
             // Increase performance level if FPS is low
             g_currentPerfLevel++;
             SetXR2PerformanceLevel(g_currentPerfLevel);
@@ -1151,17 +1155,14 @@ static bool InitializeControllers() {
     }
     
     // Start tracking controllers using QVR API
-    // Controller descriptors: "left" and "right"
-    const char* controllerDescs[] = {"left", "right"};
+    // Note: QVRServiceClient_StartTrackingWrapper doesn't exist in the API
+    // Controllers are tracked automatically when tracking mode is set
+    // We'll mark controllers as connected when they're detected
+    // In a real implementation, you'd use QVRServiceClient_GetControllerState or similar
     for (int i = 0; i < 2; ++i) {
-        int handle = QVRServiceClient_StartTrackingWrapper(qvrClient, controllerDescs[i]);
-        if (handle >= 0) {
-            g_controllers[i].controllerHandle = handle;
-            g_controllers[i].connected = true;
-            LOGI("Controller %d (%s) started tracking, handle=%d", i, controllerDescs[i], handle);
-        } else {
-            LOGW("Failed to start tracking for controller %d (%s)", i, controllerDescs[i]);
-        }
+        // Placeholder: Controllers will be detected when they're actually connected
+        g_controllers[i].controllerHandle = -1; // No handle available
+        g_controllers[i].connected = false; // Will be set to true when detected
     }
     
     g_controllersInitialized = true;
@@ -1545,8 +1546,8 @@ bool TriggerXR2HapticFeedback(XrAction action, XrPath subactionPath,
 }
 
 bool SetXR2PerformanceLevel(uint32_t level) {
-    if (level > MAX_PERF_LEVEL) {
-        level = MAX_PERF_LEVEL;
+    if (level > XR2_MAX_PERF_LEVEL) {
+        level = XR2_MAX_PERF_LEVEL;
     }
     
     QVRServiceClientHandle qvrClient = GetQVRClient();
@@ -1556,10 +1557,10 @@ bool SetXR2PerformanceLevel(uint32_t level) {
     
     // Map performance level to QVR performance levels
     qvrservice_perf_level_t perfLevels[2];
-    perfLevels[0].type = QVRSERVICE_PERF_LEVEL_CPU;
-    perfLevels[0].level = level;
-    perfLevels[1].type = QVRSERVICE_PERF_LEVEL_GPU;
-    perfLevels[1].level = level;
+    perfLevels[0].hw_type = HW_TYPE_CPU;
+    perfLevels[0].perf_level = (QVRSERVICE_PERF_LEVEL)(level + 1); // Map 0-3 to PERF_LEVEL_1-3
+    perfLevels[1].hw_type = HW_TYPE_GPU;
+    perfLevels[1].perf_level = (QVRSERVICE_PERF_LEVEL)(level + 1); // Map 0-3 to PERF_LEVEL_1-3
     
     int result = QVRServiceClient_SetOperatingLevelWrapper(qvrClient, perfLevels, 2);
     if (result != QVR_SUCCESS) {
@@ -1594,7 +1595,7 @@ XrTime GetXR2CurrentTime() {
 }
 
 // Hand tracking state
-static bool g_handTrackingInitialized = false;
+// Note: g_handTrackingInitialized is already defined at the top of the file, removing duplicate definition
 
 bool InitializeXR2HandTracking() {
     std::lock_guard<std::mutex> lock(g_xr2Mutex);

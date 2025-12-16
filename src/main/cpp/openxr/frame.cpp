@@ -7,6 +7,15 @@
 #include <unordered_map>
 #include <memory>
 
+// Forward declaration of XRSession structure
+struct XRSession {
+    XrInstance instance;
+    XrSessionState state;
+    XrViewConfigurationType viewConfigType;
+    bool active;
+    std::mutex mutex;
+};
+
 // External declarations
 extern std::mutex g_sessionMutex;
 extern std::unordered_map<XrSession, std::shared_ptr<XRSession>> g_sessions;

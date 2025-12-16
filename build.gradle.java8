@@ -1,0 +1,19 @@
+// Alternative build.gradle for Java 8 compatibility
+// Rename this file to build.gradle if you want to use Java 8
+
+// Top-level build file
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Android Gradle Plugin 7.4.2 supports Java 8
+        classpath 'com.android.tools.build:gradle:7.4.2'
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+

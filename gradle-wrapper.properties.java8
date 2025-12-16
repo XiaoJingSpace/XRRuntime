@@ -1,0 +1,11 @@
+# Alternative gradle-wrapper.properties for Java 8 compatibility
+# Copy this content to gradle/wrapper/gradle-wrapper.properties if using Java 8
+
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-7.6-bin.zip
+networkTimeout=10000
+validateDistributionUrl=true
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+

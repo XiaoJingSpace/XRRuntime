@@ -1,6 +1,7 @@
 #include "openxr_api.h"
 #include "platform/display_manager.h"
 #include "utils/logger.h"
+#include <cstdint>
 #include <mutex>
 #include <vector>
 #include <unordered_map>
@@ -39,8 +40,8 @@ struct XRSwapchain {
     XRSwapchain(XrSession sess) : session(sess), currentImageIndex(0) {}
 };
 
-static std::mutex g_swapchainMutex;
-static std::unordered_map<XrSwapchain, std::shared_ptr<XRSwapchain>> g_swapchains;
+std::mutex g_swapchainMutex;
+std::unordered_map<XrSwapchain, std::shared_ptr<XRSwapchain>> g_swapchains;
 static XrSwapchain g_nextSwapchainHandle = reinterpret_cast<XrSwapchain>(0x3000);
 
 XrResult xrCreateSwapchain(XrSession session, const XrSwapchainCreateInfo* createInfo, XrSwapchain* swapchain) {
@@ -75,7 +76,8 @@ XrResult xrCreateSwapchain(XrSession session, const XrSwapchainCreateInfo* creat
     xrSwapchain->arraySize = createInfo->arraySize;
     xrSwapchain->mipCount = createInfo->mipCount;
     xrSwapchain->faceCount = createInfo->faceCount;
-    xrSwapchain->arrayLayerCount = createInfo->arrayLayerCount;
+    // Note: XrSwapchainCreateInfo uses arraySize, not arrayLayerCount
+    // arraySize is already set above
     xrSwapchain->sampleCount = createInfo->sampleCount;
     xrSwapchain->format = createInfo->format;
     xrSwapchain->usageFlags = createInfo->usageFlags;
@@ -94,7 +96,11 @@ XrResult xrCreateSwapchain(XrSession session, const XrSwapchainCreateInfo* creat
     
     // Register swapchain
     std::lock_guard<std::mutex> swapLock(g_swapchainMutex);
-    XrSwapchain handle = g_nextSwapchainHandle++;
+    // Increment handle using integer arithmetic (handles are pointers in 64-bit)
+    uintptr_t handleValue = reinterpret_cast<uintptr_t>(g_nextSwapchainHandle);
+    handleValue++;
+    XrSwapchain handle = reinterpret_cast<XrSwapchain>(handleValue);
+    g_nextSwapchainHandle = handle;
     g_swapchains[handle] = xrSwapchain;
     *swapchain = handle;
     

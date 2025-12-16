@@ -1,6 +1,7 @@
 #include "openxr_api.h"
 #include "platform/input_manager.h"
 #include "utils/logger.h"
+#include <cstdint>
 #include <mutex>
 #include <unordered_map>
 #include <string>
@@ -29,12 +30,12 @@ struct XRAction {
     std::unordered_map<XrPath, XrPath> subactionPaths;
 };
 
-static std::mutex g_actionSetMutex;
-static std::unordered_map<XrActionSet, std::shared_ptr<XRActionSet>> g_actionSets;
+std::mutex g_actionSetMutex;
+std::unordered_map<XrActionSet, std::shared_ptr<XRActionSet>> g_actionSets;
 static XrActionSet g_nextActionSetHandle = reinterpret_cast<XrActionSet>(0x4000);
 
-static std::mutex g_actionMutex;
-static std::unordered_map<XrAction, std::shared_ptr<XRAction>> g_actions;
+std::mutex g_actionMutex;
+std::unordered_map<XrAction, std::shared_ptr<XRAction>> g_actions;
 static XrAction g_nextActionHandle = reinterpret_cast<XrAction>(0x5000);
 
 XrResult xrCreateActionSet(XrInstance instance, const XrActionSetCreateInfo* createInfo, XrActionSet* actionSet) {
@@ -62,7 +63,11 @@ XrResult xrCreateActionSet(XrInstance instance, const XrActionSetCreateInfo* cre
     
     // Register action set
     std::lock_guard<std::mutex> setLock(g_actionSetMutex);
-    XrActionSet handle = g_nextActionSetHandle++;
+    // Increment handle using integer arithmetic (handles are pointers in 64-bit)
+    uintptr_t handleValue = reinterpret_cast<uintptr_t>(g_nextActionSetHandle);
+    handleValue++;
+    XrActionSet handle = reinterpret_cast<XrActionSet>(handleValue);
+    g_nextActionSetHandle = handle;
     g_actionSets[handle] = xrActionSet;
     *actionSet = handle;
     
@@ -112,7 +117,11 @@ XrResult xrCreateAction(XrActionSet actionSet, const XrActionCreateInfo* createI
     
     // Register action
     std::lock_guard<std::mutex> actLock(g_actionMutex);
-    XrAction handle = g_nextActionHandle++;
+    // Increment handle using integer arithmetic (handles are pointers in 64-bit)
+    uintptr_t handleValue = reinterpret_cast<uintptr_t>(g_nextActionHandle);
+    handleValue++;
+    XrAction handle = reinterpret_cast<XrAction>(handleValue);
+    g_nextActionHandle = handle;
     g_actions[handle] = xrAction;
     *action = handle;
     

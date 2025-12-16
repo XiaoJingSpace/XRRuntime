@@ -213,6 +213,10 @@
 
 ## 已知限制
 
+详细的已知限制和待完善功能请参考 [已知限制文档](KNOWN_LIMITATIONS.md)。
+
+### 主要限制摘要
+
 1. **平台特定实现**
    - 部分功能需要实际的 XR2 SDK 和硬件设备进行完整测试
    - 控制器 API 需要实际的控制器服务连接
@@ -224,9 +228,13 @@
    - 姿态预测的旋转部分需要角速度数据支持
 
 3. **功能完善**
-   - 控制器状态同步使用简化实现，完整实现需要 QVR SDK 的控制器状态结构定义
+   - **控制器状态同步**（`src/main/cpp/qualcomm/xr2_platform.cpp:1507`）
+     - 当前使用简化实现，仅检查控制器连接状态
+     - TODO: 需要实现完整的 QVR API 控制器状态读取
+     - 完整实现需要 QVR SDK 的控制器状态结构定义
+   - **Spaces SDK 包装器**（`src/main/cpp/qualcomm/spaces_sdk_wrapper.cpp`）
+     - 当前为占位实现，需要实际的 Snapdragon Spaces SDK 集成
    - 眼动追踪 API 已集成框架，需要实际设备验证
-   - 某些高级功能需要 Snapdragon Spaces SDK 的完整集成
 
 4. **测试状态**
    - 代码已通过编译检查

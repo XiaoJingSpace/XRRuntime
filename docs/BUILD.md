@@ -16,14 +16,15 @@
 - JDK 8 或更高版本
 
 ### 3. 第三方库
-- OpenXR SDK 1.1.x
-  - 下载地址: https://github.com/KhronosGroup/OpenXR-SDK
-  - 解压到 `libs/openxr/`
+- **OpenXR SDK Source 1.1.x**（必需）
+  - 下载地址: https://github.com/KhronosGroup/OpenXR-SDK-Source
+  - **重要**: 需要 SDK Source（源代码版本），不是预编译版本
+  - 详细设置步骤请参考 [OpenXR SDK 设置指南](OPENXR_SDK_SETUP.md)
+  - 头文件应放置在 `include/openxr/` 或 `libs/openxr/include/openxr/`
   
-- 高通 XR2 SDK
-  - Snapdragon Spaces SDK (需要高通开发者账号)
-  - QVR API (如果可用，需要 NDA)
-  - 放置到 `libs/qualcomm/`
+- **高通 XR2 SDK**（已包含）
+  - Snapdragon XR SDK 4.0.5（已包含在项目中）
+  - QVR API 头文件位于 `SnapdragonXR-SDK-source.rel.4.0.5/3rdparty/qvr/inc`
 
 ## 环境配置
 
@@ -38,14 +39,14 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools
 ### 2. 配置项目
 
 1. 克隆或下载项目代码
-2. 将 OpenXR SDK 头文件复制到 `include/openxr/`
-3. 将高通 SDK 库和头文件复制到 `libs/qualcomm/`
+2. **设置 OpenXR SDK Source**（必需）
+   - 参考 [OpenXR SDK 设置指南](OPENXR_SDK_SETUP.md) 获取详细步骤
+   - 将 OpenXR SDK Source 的头文件复制到 `include/openxr/` 或 `libs/openxr/include/openxr/`
+3. 高通 XR2 SDK 已包含在项目中，无需额外配置
 
-### 3. 更新 CMakeLists.txt
+### 3. 验证配置
 
-确保 CMakeLists.txt 中的路径正确：
-- OpenXR 头文件路径
-- 高通 SDK 库路径
+CMakeLists.txt 会自动检查 OpenXR 头文件是否存在。如果缺失，编译时会显示清晰的错误信息。
 
 ## 编译步骤
 
@@ -74,9 +75,15 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools
 
 #### 使用构建脚本
 
+**Linux/macOS:**
 ```bash
 chmod +x scripts/build.sh
 ./scripts/build.sh debug    # 或 release
+```
+
+**Windows:**
+```batch
+scripts\build.bat debug     # 或 release
 ```
 
 ## 输出位置
@@ -122,9 +129,12 @@ ndk.dir=/path/to/ndk
 
 ### 2. OpenXR 头文件未找到
 
-**错误**: `fatal error: openxr/openxr.h: No such file or directory`
+**错误**: `fatal error: openxr/openxr.h: No such file or directory` 或 CMake 错误提示找不到 OpenXR SDK
 
-**解决**: 确保 OpenXR SDK 已正确放置到 `libs/openxr/include/`，并检查 CMakeLists.txt 中的包含路径。
+**解决**: 
+- 参考 [OpenXR SDK 设置指南](OPENXR_SDK_SETUP.md) 设置 OpenXR SDK Source
+- 确保头文件已正确复制到 `include/openxr/` 或 `libs/openxr/include/openxr/`
+- CMakeLists.txt 会自动检查并给出清晰的错误提示
 
 ### 3. 高通 SDK 库未找到
 

@@ -3,6 +3,7 @@
 #include "qualcomm/xr2_platform.h"
 #include "utils/logger.h"
 #include <cstring>
+#include <cstdint>
 #include <mutex>
 #include <atomic>
 #include <unordered_map>
@@ -23,8 +24,8 @@ struct XRSession {
                                  viewConfigType(XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO), active(false) {}
 };
 
-static std::mutex g_sessionMutex;
-static std::unordered_map<XrSession, std::shared_ptr<XRSession>> g_sessions;
+std::mutex g_sessionMutex;
+std::unordered_map<XrSession, std::shared_ptr<XRSession>> g_sessions;
 static XrSession g_nextSessionHandle = reinterpret_cast<XrSession>(0x1000);
 
 XrResult xrCreateSession(XrInstance instance, const XrSessionCreateInfo* createInfo, XrSession* session) {
@@ -70,7 +71,11 @@ XrResult xrCreateSession(XrInstance instance, const XrSessionCreateInfo* createI
     
     // Register session
     std::lock_guard<std::mutex> sessLock(g_sessionMutex);
-    XrSession handle = g_nextSessionHandle++;
+    // Increment handle using integer arithmetic (handles are pointers in 64-bit)
+    uintptr_t handleValue = reinterpret_cast<uintptr_t>(g_nextSessionHandle);
+    handleValue++;
+    XrSession handle = reinterpret_cast<XrSession>(handleValue);
+    g_nextSessionHandle = handle;
     g_sessions[handle] = xrSession;
     *session = handle;
     

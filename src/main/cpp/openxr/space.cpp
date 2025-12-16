@@ -2,6 +2,7 @@
 #include "qualcomm/xr2_platform.h"
 #include "platform/input_manager.h"
 #include "utils/logger.h"
+#include <cstdint>
 #include <mutex>
 #include <unordered_map>
 #include <cstring>
@@ -30,8 +31,8 @@ struct XRSpace {
     }
 };
 
-static std::mutex g_spaceMutex;
-static std::unordered_map<XrSpace, std::shared_ptr<XRSpace>> g_spaces;
+std::mutex g_spaceMutex;
+std::unordered_map<XrSpace, std::shared_ptr<XRSpace>> g_spaces;
 static XrSpace g_nextSpaceHandle = reinterpret_cast<XrSpace>(0x2000);
 
 XrResult xrCreateReferenceSpace(XrSession session, const XrReferenceSpaceCreateInfo* createInfo, XrSpace* space) {
@@ -64,7 +65,11 @@ XrResult xrCreateReferenceSpace(XrSession session, const XrReferenceSpaceCreateI
     
     // Register space
     std::lock_guard<std::mutex> spaceLock(g_spaceMutex);
-    XrSpace handle = g_nextSpaceHandle++;
+    // Increment handle using integer arithmetic (handles are pointers in 64-bit)
+    uintptr_t handleValue = reinterpret_cast<uintptr_t>(g_nextSpaceHandle);
+    handleValue++;
+    XrSpace handle = reinterpret_cast<XrSpace>(handleValue);
+    g_nextSpaceHandle = handle;
     g_spaces[handle] = xrSpace;
     *space = handle;
     
@@ -94,7 +99,11 @@ XrResult xrCreateActionSpace(XrSession session, const XrActionSpaceCreateInfo* c
     
     // Register space
     std::lock_guard<std::mutex> spaceLock(g_spaceMutex);
-    XrSpace handle = g_nextSpaceHandle++;
+    // Increment handle using integer arithmetic (handles are pointers in 64-bit)
+    uintptr_t handleValue = reinterpret_cast<uintptr_t>(g_nextSpaceHandle);
+    handleValue++;
+    XrSpace handle = reinterpret_cast<XrSpace>(handleValue);
+    g_nextSpaceHandle = handle;
     g_spaces[handle] = xrSpace;
     *space = handle;
     

@@ -58,6 +58,21 @@
   - 数据转换
   - 追踪模式和状态
 
+- **[OpenXR SDK 设置指南](OPENXR_SDK_SETUP.md)** ⭐
+  - OpenXR SDK Source 设置步骤
+  - 目录结构配置
+  - 常见问题解答
+
+- **[Cursor 编译指南](CURSOR_COMPILE_GUIDE.md)** ⭐
+  - 在 Cursor/VS Code 中编译项目
+  - 任务配置和使用
+  - 调试配置
+
+- **[已知限制文档](KNOWN_LIMITATIONS.md)**
+  - 代码中的 TODO 标记
+  - 占位实现说明
+  - 功能限制和测试状态
+
 ## 📋 文档阅读顺序建议
 
 ### 对于新用户
@@ -89,12 +104,14 @@
 - **调试问题** → [调试指南](DEBUG.md)
 - **架构问题** → [架构文档](ARCHITECTURE.md)
 - **QVR API** → [QVR 集成指南](QVR_INTEGRATION.md)
+- **OpenXR SDK 设置** → [OpenXR SDK 设置指南](OPENXR_SDK_SETUP.md)
 - **API 使用** → [API 参考](API_REFERENCE.md)
 - **项目概览** → [完整项目说明](PROJECT_GUIDE.md)
 
 ### 按任务查找
 
 - **设置开发环境** → [构建指南 - 前置要求](BUILD.md#前置要求)
+- **设置 OpenXR SDK** → [OpenXR SDK 设置指南](OPENXR_SDK_SETUP.md)
 - **编译项目** → [构建指南 - 编译步骤](BUILD.md#编译步骤)
 - **部署到设备** → [部署指南 - 部署方法](DEPLOY.md#部署方法)
 - **调试应用** → [调试指南 - 调试工具](DEBUG.md#调试工具)

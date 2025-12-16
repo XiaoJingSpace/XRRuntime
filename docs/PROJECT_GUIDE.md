@@ -617,15 +617,25 @@ while (running) {
 - 重启 Android Studio
 - File → Invalidate Caches / Restart
 
-#### 2. 编译错误：找不到 QVR 头文件
+#### 2. 编译错误：找不到 OpenXR 头文件
+
+**问题**: `fatal error: openxr/openxr.h: No such file or directory` 或 CMake 错误提示找不到 OpenXR SDK
+
+**解决方案**:
+- 参考 [OpenXR SDK 设置指南](OPENXR_SDK_SETUP.md) 设置 OpenXR SDK Source
+- 确保头文件已正确复制到 `include/openxr/` 或 `libs/openxr/include/openxr/`
+- CMakeLists.txt 会自动检查并给出清晰的错误提示
+
+#### 3. 编译错误：找不到 QVR 头文件
 
 **问题**: `fatal error: QVRServiceClient.h: No such file or directory`
 
 **解决方案**:
 - 确认 Snapdragon XR SDK 路径正确
 - 检查 `CMakeLists.txt` 中的包含路径
+- QVR 头文件位于 `SnapdragonXR-SDK-source.rel.4.0.5/3rdparty/qvr/inc`
 
-#### 3. 运行时错误：找不到 QVR 库
+#### 4. 运行时错误：找不到 QVR 库
 
 **问题**: `cannot locate symbol` 或 `library not found`
 
@@ -633,7 +643,7 @@ while (running) {
 - 确认设备上存在 `libqvrservice_client.qti.so`
 - 检查 SO 库路径和权限
 
-#### 4. 追踪数据无效
+#### 5. 追踪数据无效
 
 **问题**: 空间定位返回无效数据
 
@@ -658,6 +668,8 @@ while (running) {
 - [调试指南](DEBUG.md) - 调试技巧和故障排除
 - [API 参考](API_REFERENCE.md) - API 实现参考
 - [QVR 集成指南](QVR_INTEGRATION.md) - QVR API 集成详细说明
+- [OpenXR SDK 设置指南](OPENXR_SDK_SETUP.md) - OpenXR SDK Source 设置说明
+- [已知限制](KNOWN_LIMITATIONS.md) - 已知限制和待完善功能
 
 ---
 

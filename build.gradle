@@ -5,14 +5,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.0'
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
+        // Using AGP 7.2.2 for Android Studio compatibility (latest supported version)
+        // To use AGP 8.1.0, upgrade to Java 17+ and change this to: classpath 'com.android.tools.build:gradle:8.1.0'
+        classpath 'com.android.tools.build:gradle:7.2.2'
     }
 }
 

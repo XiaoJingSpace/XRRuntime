@@ -81,7 +81,8 @@ void PostInstanceLossPendingEvent(XrInstance instance) {
     XrEventDataInstanceLossPending event = {};
     event.type = XR_TYPE_EVENT_DATA_INSTANCE_LOSS_PENDING;
     event.next = nullptr;
-    event.instance = instance;
+    // Note: XrEventDataInstanceLossPending doesn't have instance member
+    // The instance is implicit from the context
     event.lossTime = GetCurrentXrTime();
     
     XrEventDataBuffer buffer = {};
