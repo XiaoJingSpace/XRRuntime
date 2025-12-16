@@ -1,0 +1,16 @@
+stateDiagram-v2
+    [*] --> UNKNOWN: 创建 Session
+    UNKNOWN --> IDLE: 初始化完成
+    IDLE --> READY: xrBeginSession
+    READY --> SYNCHRONIZED: 同步显示
+    SYNCHRONIZED --> VISIBLE: 可见
+    VISIBLE --> FOCUSED: 获得焦点
+    FOCUSED --> VISIBLE: 失去焦点
+    VISIBLE --> SYNCHRONIZED: 不可见
+    SYNCHRONIZED --> READY: 失去同步
+    FOCUSED --> STOPPING: xrEndSession
+    STOPPING --> IDLE: 停止完成
+    FOCUSED --> LOSS_PENDING: 运行时丢失
+    LOSS_PENDING --> EXITING: 确认退出
+    EXITING --> [*]: 销毁 Session
+    IDLE --> [*]: 销毁 Session

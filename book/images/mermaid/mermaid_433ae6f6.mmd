@@ -1,0 +1,25 @@
+flowchart TD
+    A[应用程序调用<br/>xrCreateInstance] --> B[验证 CreateInfo]
+    B --> C{参数有效?}
+    C -->|否| D[返回<br/>XR_ERROR_VALIDATION_FAILURE]
+    C -->|是| E[检查 API 版本]
+    E --> F{版本兼容?}
+    F -->|否| G[返回<br/>XR_ERROR_API_VERSION_UNSUPPORTED]
+    F -->|是| H[检测扩展]
+    H --> I[初始化 Android 平台]
+    I --> J{初始化成功?}
+    J -->|否| K[返回<br/>XR_ERROR_RUNTIME_FAILURE]
+    J -->|是| L[初始化 XR2 平台]
+    L --> M{初始化成功?}
+    M -->|否| N[清理 Android 平台]
+    N --> K
+    M -->|是| O[创建内部 Instance 对象]
+    O --> P[分配资源]
+    P --> Q[返回 Instance 句柄]
+    Q --> R[返回 XR_SUCCESS]
+    
+    style A fill:#e1f5ff
+    style D fill:#ffcccc
+    style G fill:#ffcccc
+    style K fill:#ffcccc
+    style R fill:#ccffcc

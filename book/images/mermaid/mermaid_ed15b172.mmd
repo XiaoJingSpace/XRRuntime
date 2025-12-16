@@ -1,0 +1,9 @@
+graph TD
+    A[应用程序层<br/>OpenXR Application] --> B[OpenXR Loader]
+    B --> C[XR Runtime<br/>libxrruntime.so]
+    C --> D[平台层<br/>Android/QVR API]
+    D --> E[硬件层<br/>XR2 芯片]
+    
+    style A fill:#e1f5ff
+    style C fill:#fff4e1
+    style E fill:#ffe1f5

@@ -1,0 +1,55 @@
+graph TB
+    subgraph "应用层"
+        A[OpenXR Application]
+    end
+    
+    subgraph "OpenXR API 层"
+        B1[Instance 管理]
+        B2[Session 管理]
+        B3[Frame 循环]
+        B4[Space 追踪]
+        B5[Swapchain 管理]
+        B6[Input 系统]
+        B7[Event 系统]
+    end
+    
+    subgraph "平台抽象层"
+        C1[Android 平台集成]
+        C2[显示管理]
+        C3[输入管理]
+        C4[帧同步]
+    end
+    
+    subgraph "硬件平台层"
+        D1[QVR API 集成]
+        D2[XR2 平台特性]
+        D3[追踪系统]
+        D4[性能管理]
+    end
+    
+    subgraph "工具层"
+        E1[日志系统]
+        E2[错误处理]
+        E3[内存管理]
+    end
+    
+    A --> B1
+    A --> B2
+    A --> B3
+    B1 --> C1
+    B2 --> C1
+    B3 --> C4
+    B4 --> D3
+    B5 --> C2
+    B6 --> C3
+    C1 --> D1
+    C2 --> D2
+    C3 --> D1
+    C4 --> D4
+    
+    style A fill:#e1f5ff
+    style B1 fill:#fff4e1
+    style B2 fill:#fff4e1
+    style B3 fill:#fff4e1
+    style C1 fill:#e1ffe1
+    style D1 fill:#ffe1f5

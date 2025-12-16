@@ -1,0 +1,28 @@
+sequenceDiagram
+    participant App as 应用程序
+    participant Runtime as XR Runtime
+    participant Platform as 平台层
+    participant Hardware as 硬件层
+    
+    App->>Runtime: xrWaitFrame()
+    Runtime->>Platform: 等待 VSYNC
+    Platform->>Hardware: 查询显示时间
+    Hardware-->>Platform: 返回时间戳
+    Platform-->>Runtime: 预测显示时间
+    Runtime-->>App: FrameState
+    
+    App->>Runtime: xrBeginFrame()
+    Runtime->>Platform: 准备渲染
+    Platform->>Hardware: 获取 Swapchain
+    Hardware-->>Platform: 图像句柄
+    Platform-->>Runtime: 渲染就绪
+    Runtime-->>App: 成功
+    
+    Note over App: 渲染到 Swapchain
+    
+    App->>Runtime: xrEndFrame()
+    Runtime->>Platform: 提交帧
+    Platform->>Hardware: 显示帧
+    Hardware-->>Platform: 确认
+    Platform-->>Runtime: 完成
+    Runtime-->>App: 成功

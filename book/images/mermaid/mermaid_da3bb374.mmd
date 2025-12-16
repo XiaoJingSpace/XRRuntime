@@ -1,0 +1,15 @@
+flowchart TD
+    A[应用程序调用<br/>OpenXR API] --> B[参数验证]
+    B --> C{验证通过?}
+    C -->|否| D[返回错误码]
+    C -->|是| E[转换为内部<br/>数据结构]
+    E --> F[调用平台抽象层]
+    F --> G[调用硬件平台层]
+    G --> H[硬件处理]
+    H --> I[返回结果]
+    I --> J[转换为 OpenXR 格式]
+    J --> K[返回给应用程序]
+    
+    style A fill:#e1f5ff
+    style D fill:#ffcccc
+    style K fill:#ccffcc

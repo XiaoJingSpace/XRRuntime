@@ -1,0 +1,29 @@
+graph TB
+    subgraph "主线程"
+        A1[OpenXR API 调用]
+        A2[事件处理]
+        A3[资源管理]
+    end
+    
+    subgraph "渲染线程"
+        B1[Frame 循环]
+        B2[Swapchain 管理]
+        B3[渲染同步]
+    end
+    
+    subgraph "追踪线程"
+        C1[头部追踪数据获取]
+        C2[姿态预测]
+        C3[空间计算]
+    end
+    
+    A1 --> B1
+    A2 --> B1
+    A3 --> B1
+    C1 --> A1
+    C2 --> B1
+    C3 --> A1
+    
+    style A1 fill:#e1f5ff
+    style B1 fill:#fff4e1
+    style C1 fill:#e1ffe1

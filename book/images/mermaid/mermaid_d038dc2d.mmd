@@ -1,0 +1,13 @@
+flowchart LR
+    A[验证 Android SDK] --> B[验证 NDK]
+    B --> C[验证 CMake]
+    C --> D[验证 OpenXR 头文件]
+    D --> E[验证 QVR API]
+    E --> F{所有验证通过?}
+    F -->|是| G[环境就绪]
+    F -->|否| H[查看错误信息]
+    H --> I[修复配置]
+    I --> A
+    
+    style G fill:#ccffcc
+    style H fill:#ffcccc

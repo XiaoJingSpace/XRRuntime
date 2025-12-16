@@ -1,0 +1,50 @@
+graph TB
+    subgraph "应用层"
+        A[OpenXR Application<br/>使用 OpenXR Loader]
+    end
+    
+    subgraph "OpenXR API 实现层"
+        B1[API 函数映射]
+        B2[参数验证与转换]
+        B3[错误处理]
+    end
+    
+    subgraph "平台抽象层"
+        C1[Android 平台集成]
+        C2[显示管理]
+        C3[输入管理]
+        C4[帧同步]
+    end
+    
+    subgraph "硬件平台层"
+        D1[QVR API 集成]
+        D2[追踪系统]
+        D3[性能管理]
+    end
+    
+    subgraph "硬件层"
+        E[XR2 芯片]
+    end
+    
+    A --> B1
+    B1 --> B2
+    B2 --> B3
+    B3 --> C1
+    C1 --> C2
+    C1 --> C3
+    C1 --> C4
+    C2 --> D1
+    C3 --> D1
+    C4 --> D3
+    D1 --> D2
+    D1 --> E
+    D2 --> E
+    D3 --> E
+    
+    style A fill:#e1f5ff
+    style B1 fill:#fff4e1
+    style B2 fill:#fff4e1
+    style B3 fill:#fff4e1
+    style C1 fill:#e1ffe1
+    style D1 fill:#ffe1f5
+    style E fill:#f5e1ff
